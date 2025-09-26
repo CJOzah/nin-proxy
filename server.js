@@ -29,8 +29,16 @@ app.post("/submit", async (req, res) => {
       body: JSON.stringify(req.body),
     });
 
-    const data = await response.json();
-    res.json(data);
+    const text = await response.text();  // 👈 get raw text
+    let data;
+
+    try {
+      data = JSON.parse(text);  // try to parse JSON
+    } catch {
+      data = { status: "ok", raw: text }; // fallback if not JSON
+    }
+
+    res.json(data); // ✅ always send JSON back to Flutter
   } catch (err) {
     res.status(500).json({ error: err.toString() });
   }
